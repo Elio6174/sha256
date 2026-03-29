@@ -1,7 +1,9 @@
 #include <stdio.h>
-    
+#include <string.h>
+
 void printBlock(char[64]);
 void printBit(char);
+void printBitInt(int);
 void printScheduleBlock(char[64][4]);
 void schedule(char[]);
 
@@ -10,6 +12,15 @@ int main(){
   //printBlock(messageBlock);
   
   schedule(messageBlock);
+  
+  printf("prueba de char a int\n");
+  char cadena[4] = {"asdf"};
+
+  //int data = (int)cadena;
+  int data;
+  memcpy(&data, cadena, 4);
+  
+  printBitInt(data);
   return 0;
 }
 
@@ -56,3 +67,15 @@ void printBit(char c){
     printf("%d", bit);
   }
 }
+
+void printBitInt(int c){
+  for (int i = 31; i >= 0; i--) {
+    int k = c >> i; // Desplaza el bit a la posición 0
+    if (k & 1)      // Comprueba si el bit es 1
+      printf("1");
+    else
+      printf("0");
+  }
+   printf("\n");
+}
+
