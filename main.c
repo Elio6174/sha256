@@ -8,6 +8,9 @@ int main(){
   
   schedule(messageBlock, strlen(messageBlock));
   
+  //buildHash();
+
+
   return 0;
 }
 
