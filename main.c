@@ -4,7 +4,7 @@
 void printBlock(char[64]);
 void printBit(char);
 void printBitInt(int);
-void printScheduleBlock(char[64][4]);
+void printScheduleBlock(int[64]);
 void schedule(char[]);
 
 int main(){
@@ -13,27 +13,32 @@ int main(){
   
   schedule(messageBlock);
   
-  printf("prueba de char a int\n");
-  char cadena[4] = {"asdf"};
+  //printf("prueba de char a int\n");
+  //char cadena[4] = {"asdf"};
 
   //int data = (int)cadena;
-  int data;
-  memcpy(&data, cadena, 4);
   
-  printBitInt(data);
+  //int data;
+  //memcpy(&data, cadena, 4);
+  
+  //printBitInt(data);
   return 0;
 }
 
 void schedule(char block[]){
-  char scheduleBlock[64][4];
-  
-  for(int i=0; i<64; i++){
+  int scheduleBlock[64];
+  char temp[4];
+
+  for(int i=0; i<10; i++){
     for(int k=0; k<4;k++){
-      if(i<16)
-        scheduleBlock[i][k]= block[4*i +k];
-      else
-        scheduleBlock[i][k]= 0;
+      if(i<16){
+        temp[k]=block[4*i+k];
+        //scheduleBlock[i][k]= block[4*i +k];
+    }else
+        temp[k]=0;
     }
+    //printf("%s\n", temp);i
+    scheduleBlock[i]=(temp[0] << 24)|(temp[1] << 16)|(temp[2] << 8)|(temp[3]);
   }
 
   printScheduleBlock(scheduleBlock);
@@ -51,12 +56,9 @@ void printBlock(char block[]){
   printf("\n");
 }
 
-void printScheduleBlock(char scheduleBlock[64][4]){
-  for(int i=0; i<64; i++){
-    for(int k=0; k<4; k++){
-      printBit(scheduleBlock[i][k]);
-    }
-    printf("\n");
+void printScheduleBlock(int scheduleBlock[64]){
+  for(int i=0; i<10; i++){
+    printBitInt(scheduleBlock[i]);
   }
   printf("\n");
 }
