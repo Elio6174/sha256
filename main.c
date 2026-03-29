@@ -11,11 +11,16 @@ int w(int, int);// revisar esta parte puede ser mas eficiente aun en la
 
 int main(){
 	char messageBlock[55]= {"hola Mundo"};
+  //printBit(messageBlock[9]);
+  //printf("\n");
   messageBlock[strlen(messageBlock)] = 0x80;
+  //printBit(messageBlock[9]);
+  //printf("\n");
+  
   
   
   schedule(messageBlock, strlen(messageBlock));
-  printBlock(messageBlock);
+  //printBlock(messageBlock);
   
   return 0;
 }
@@ -30,16 +35,42 @@ void schedule(char block[], int len){
   //block[len+1] = 0x80;
   char temp[4];
 
-  for(int i=0; i<64; i++){
+  for(int i=2; i<3; i++){
     for(int k=0; k<4;k++){
-      if(i<16){
+      if(i<14){
         temp[k]=block[4*i+k];
-    }else
+        printf("i:%d k:%d   temp:", i,k);
+        printBit(temp[k]);
+
+        printf("  block:");
+        printBit(block[4*i+k]);
+        printf("\n");
+      }else
         temp[k]=0;
     }
-    scheduleBlock[i]=(temp[0] << 24)|(temp[1] << 16)|(temp[2] << 8)|(temp[3]);
+    printBit(temp[0]);
+    printf("\n");
+    printBit(temp[1]);
+    printf("\n");
+    printBit(temp[2]);
+    printf("\n");
+    printBit(temp[3]);
+    printf("\nschedule de 2\n");
+    
+    printBitInt((temp[0] << 24));
+    //printBitInt((temp[0] << 24)|(temp[1] << 16)|(temp[2] << 8)|(temp[3]));
+    printf("\n");
+    printBitInt((temp[1] << 16));
+    printf("\n");
+    printBitInt((temp[2] << 8));
+    printf("\n");
+    //scheduleBlock[i]=(temp[0] << 24)|(temp[1] << 16)|(temp[2] << 8)|(temp[3]);
   }
   scheduleBlock[15] = len*8;
+  
+
+  //printBitInt(scheduleBlock[2]);
+
   //scheduleBlock[11] = 128;
 /*
   int out1=0, out2=0;
@@ -69,7 +100,7 @@ void schedule(char block[], int len){
   //printBitInt(scheduleBlock[1]>>3);
   //printf("\n");
 */
-  printScheduleBlock(scheduleBlock);
+  //printScheduleBlock(scheduleBlock);
 }
 
 
@@ -85,8 +116,8 @@ void printBlock(char block[]){
 }
 
 void printScheduleBlock(int scheduleBlock[64]){
-  for(int i=0; i<64; i++){
-    printf("w%d\t  ", i);
+  for(int i=0; i<3; i++){
+    //printf("w%d\t  ", i);
     printBitInt(scheduleBlock[i]);
     printf("\n");
   }
