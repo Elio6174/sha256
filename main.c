@@ -3,14 +3,14 @@
 #include <sha256.h>
 
 int main(){
-	unsigned char messageBlock[55]= {"este es un mensaje cifrado con el algoritmo sha256"};
-  messageBlock[strlen(messageBlock)] = 0x80;
+	unsigned char messageBlock[55]= {"hola mundo"};
+  printf("Mensaje:%s\n", messageBlock);
   
-  schedule(messageBlock, strlen(messageBlock));
-  
-  //buildHash();
+  unsigned char *sha256Out = sha256(messageBlock);
 
-
+  for(int i = 0; i < 32; i++) {
+    printf("%02X", sha256Out[i]);
+  }
   return 0;
 }
 

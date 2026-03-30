@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 #include <constants.h>
 
@@ -11,151 +12,74 @@ void printBlock(char[]);
 void printBit(char);
 void printBitInt(uint32_t);
 void printScheduleBlock(uint32_t[64]);
-void schedule(unsigned char[], int);
+unsigned char* sha256(unsigned char[]);
 uint32_t w(uint32_t, int);// revisar esta parte puede ser mas eficiente aun en la variable n
 uint32_t ch(uint32_t, uint32_t, uint32_t);
 uint32_t maj(uint32_t, uint32_t, uint32_t);
-void buildHash(uint32_t[64]);
-uint32_t bitInvert(uint32_t);
+unsigned char* buildHash(uint32_t[64]);
 
 
-void buildHash(uint32_t scheduleBlock[64]){
+unsigned char*
+buildHash(uint32_t scheduleBlock[64]){
   uint32_t v[8] = {H0, H1, H2, H3, H4, H5, H6, H7};
   int z1, z0, choice, temp1, temp2, majority;
 
-    for(int i=0; i<64; i++){
-        z1 = w(v[4], 6)^w(v[4], 11)^w(v[4], 25);
-        choice = ch(v[4], v[5], v[6]);
-        temp1 = v[7]+z1+choice+K[i]+scheduleBlock[i];
+  for(int i=0; i<64; i++){
+    z1 = w(v[4], 6)^w(v[4], 11)^w(v[4], 25);
+    choice = ch(v[4], v[5], v[6]);
+    temp1 = v[7]+z1+choice+K[i]+scheduleBlock[i];
 
-        z0 = w(v[0], 2)^w(v[0], 13)^w(v[0], 22);
-        majority = maj(v[0],v[1],v[2]);
-        temp2 = majority+z0;
+    z0 = w(v[0], 2)^w(v[0], 13)^w(v[0], 22);
+    majority = maj(v[0],v[1],v[2]);
+    temp2 = majority+z0;
 
-        v[7]=v[6];
-        v[6]=v[5];
-        v[5]=v[4];
-        v[4]=v[3]+temp1;
-        v[3]=v[2];
-        v[2]=v[1];
-        v[1]=v[0];
-        v[0] = temp1 + temp2;
+    v[7]=v[6];
+    v[6]=v[5];
+    v[5]=v[4];
+    v[4]=v[3]+temp1;
+    v[3]=v[2];
+    v[2]=v[1];
+    v[1]=v[0];
+    v[0] = temp1 + temp2;
+  }
 
+  unsigned char* sha256 = (unsigned char*)malloc(32 * sizeof(unsigned char));
+  if (sha256 == NULL) return NULL;
+
+  for(int i = 0; i < 8; i++){
+    v[i] = v[i]+H[i];
+    for(int k = 0; k<4; k++){
+      sha256[(i*4)+k]=(char)(v[i] >> (24-8*k));
     }
-    unsigned char sha2565[32];
-
-    for(int i = 0; i < 8; i++){
-      v[i] = v[i]+H[i];
-
-      printf("v[%d]: ", i);
-      printBitInt(v[i]);
-      printf("\n\n");
-
-      for(int k = 0; k<4; k++){
-        sha2565[(i*4)+k]=(char)(v[i] >> (24-8*k));
-      }
-    }
-
-    for(int i = 0; i < 32; i++) {
-        printf("%02X", sha2565[i]);
-    }
-
-/*
-
-    printf("a+H0: ");
-    a = a+H0;
-    printBitInt(a);
-    printf("\n\n");
-
-
-    printf("b+H1: ");
-    b = b+H1;
-    printBitInt(b);
-    printf("\n\n");
-
-    unsigned char sha2565[32];
-
-
-    
-
-    int i =0;
-    //for(int i = 0; i < 4; i++){
-      sha2565[i]     = (char)(a >> 24);
-      sha2565[i + 1] = (char)(a >> 16);
-      sha2565[i + 2] = (char)(a >> 8);
-      sha2565[i + 3] = (char)(a >> 0);
-      sha2565[i+4]     = (char)(b >> 24);
-      sha2565[i + 5] = (char)(b >> 16);
-      sha2565[i + 6] = (char)(b >> 8);
-      sha2565[i + 7] = (char)(b >> 0);
-    //}
-    //indice += sizeof(int);
-
-    /*
-    printf("sha de los 4 primeros bytes %02x\n", sha2565);
-    printf("sha de los 4 primeros bytes %02x\n", sha2565[0]);
-    printf("sha de los 4 primeros bytes %02x\n", sha2565[1]);
-    printf("sha de los 4 primeros bytes %02x\n", sha2565[2]);
-    printf("sha de los 4 primeros bytes %02x\n", sha2565[3]);*/
-
-    
-    /*
-    z1 = w(e, 6)^w(e, 11)^w(e, 25);
-    printf("salida: ");
-    printBitInt(z1);
-    printf("\n\n");
-
-
-    choice = ch(e, f, g);
-    printf("salida: ");
-    printBitInt(choice);
-    printf("\n");
-
-
-    temp1 = h+z1+choice+K[0]+scheduleBlock[0];
-    printf("salida: ");
-    printBitInt(temp1);
-    printf("\n");
-
-    /*printf("bit a: ");
-    printBitInt(e);
-    printf("\n");
-    printf("bit 6: ");
-    printBitInt(w(e, 6));
-    printf("\n");*/
-    
-
+  }
+  return sha256;
 }
 
 
-
-
-uint32_t w(uint32_t row, int n){
+uint32_t 
+w(uint32_t row, int n){
   return (row>>n)|(row<<(32-n)); 
 }
 
-uint32_t ch(uint32_t x, uint32_t y, uint32_t z){
+
+uint32_t 
+ch(uint32_t x, uint32_t y, uint32_t z){
     return (x & y)^(~x & z);
 }
 
-uint32_t maj(uint32_t x, uint32_t y, uint32_t z){
+
+uint32_t 
+maj(uint32_t x, uint32_t y, uint32_t z){
     return (x & y) ^ (x & z) ^ (y & z);
 }
 
-uint32_t bitInvert(uint32_t bit){
-    uint32_t res = 0;
-    
-    for (int i = 0; i < 32; i++){
-        res <<= 1;
-        res |= (bit & 1);
-        bit >>= 1;
-    }
-    return res;
-}
 
-void schedule(unsigned char block[], int len){
+unsigned char*
+sha256(unsigned char block[]){
   uint32_t scheduleBlock[64];
   unsigned char temp[4];
+  block[strlen(block)] = 0x80;
+  int len = strlen(block);
 
   for(int i=0; i<64; i++){
     for(int k=0; k<4;k++){
@@ -176,12 +100,12 @@ void schedule(unsigned char block[], int len){
   }
   //printScheduleBlock(scheduleBlock);
 
-  buildHash(scheduleBlock);
+  return buildHash(scheduleBlock);
 }
 
 
-
-void printBlock(char block[]){
+void 
+printBlock(char block[]){
   for(int i = 0; i < 16; i++){
     for(int k = 0; k < 4; k++){
       printBit(block[4*i + k]);
@@ -192,7 +116,9 @@ void printBlock(char block[]){
   printf("\n");
 }
 
-void printScheduleBlock(uint32_t scheduleBlock[64]){
+
+void 
+printScheduleBlock(uint32_t scheduleBlock[64]){
   for(int i=0; i<64; i++){
     printf("w%d\t  ", i);
     printBitInt(scheduleBlock[i]);
@@ -200,14 +126,18 @@ void printScheduleBlock(uint32_t scheduleBlock[64]){
   }
 }
 
-void printBit(char c){
+
+void 
+printBit(char c){
   for(int i = 7; i >= 0; i--){
     int bit = (c >> i) & 1;
     printf("%d", bit);
   }
 }
 
-void printBitInt(uint32_t c){
+
+void 
+printBitInt(uint32_t c){
   for (int i = 31; i >= 0; i--) {
     if ((c>>i) & 1)
       printf("1");
