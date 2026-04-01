@@ -77,30 +77,57 @@ maj(uint32_t x, uint32_t y, uint32_t z){
 unsigned char*
 sha256(unsigned char block[]){
   uint32_t scheduleBlock[64];
+  unsigned char chunkBlock[55];
   unsigned char temp[4];
-  block[strlen(block)] = 0x80;
+  //block[strlen(block)] = 0x80;
   int len = strlen(block);
 
-  for(int i=0; i<64; i++){
-    for(int k=0; k<4;k++){
-      if(i<14)
-        temp[k]=block[4*i+k];
-      else
-        temp[k]=0;
+  printf("tamanio: %d\n", len);
+
+  while(len > 0){
+    memset(chunkBlock, 0, 55);
+
+    if(len > 55)
+      memcpy(chunkBlock, block, 55);
+    else
+      memcpy(chunkBlock, block, len);
+
+    printf("mensaje: |%s|\n", chunkBlock);
+
+    for(int i=0; i<64; i++){
+      for(int k=0; k<4;k++){
+        if(i<14)
+          temp[k]=chunkBlock[4*i+k];
+        else
+          temp[k]=0;
+      }
+      scheduleBlock[i]=(temp[0] << 24)|
+                       (temp[1] << 16)|
+                       (temp[2] << 8) |
+                       (temp[3]);
     }
-    scheduleBlock[i]=(temp[0] << 24)|(temp[1] << 16)|(temp[2] << 8)|(temp[3]);
-  }
-  scheduleBlock[15] = (len-1)*8;
+    scheduleBlock[15] = (len-1)*8;
+    printScheduleBlock(scheduleBlock);
 
-  int out1=0, out2=0;
-  for(int i=16; i<64; i++){
-    out1 = w(scheduleBlock[i-15], 7) ^ w(scheduleBlock[i-15], 18) ^ (scheduleBlock[i-15]>>3);
-    out2 = w(scheduleBlock[i-2], 17) ^ w(scheduleBlock[i-2], 19) ^ (scheduleBlock[i-2]>>10);
-    scheduleBlock[i] = scheduleBlock[i-16] + out1 + scheduleBlock[i-7] + out2;
+    /*int out1=0, out2=0;
+    for(int i=16; i<64; i++){
+      out1 = w(scheduleBlock[i-15], 7)  ^ 
+             w(scheduleBlock[i-15], 18) ^ 
+             (scheduleBlock[i-15]>>3);
+      out2 = w(scheduleBlock[i-2], 17)  ^ 
+             w(scheduleBlock[i-2], 19)  ^ 
+             (scheduleBlock[i-2]>>10);
+      scheduleBlock[i] = scheduleBlock[i-16]  + 
+                         out1                 + 
+                         scheduleBlock[i-7]   + 
+                         out2;
+    }
+    printScheduleBlock(scheduleBlock);*/
+    len-=55;
   }
-  //printScheduleBlock(scheduleBlock);
 
-  return buildHash(scheduleBlock);
+  //return buildHash(scheduleBlock);
+  return NULL;
 }
 
 
