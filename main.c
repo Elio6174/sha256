@@ -30,9 +30,9 @@ int main(int argc, char *argv[]){
   
   unsigned char *sha256Out = sha256(argv[1]);
 
-  //for(int i = 0; i < 32; i++) {
-  //  printf("%02X", sha256Out[i]);
-  //}
+  for(int i = 0; i < 32; i++) {
+    printf("%02x", sha256Out[i]);
+  }
   printf("\n");
   return 0;
 }
