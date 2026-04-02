@@ -25,12 +25,6 @@ buildHash(uint32_t v[8]){
   if (sha256 == NULL) return NULL;
 
   for(int i = 0; i < 8; i++){
-    printf("h%d  : ", i);
-    printBitInt(v[i]);
-    printf("\n");
-    printf("h[%d]: ", i);
-    printBitInt(H[i]);
-    printf("\n");
     for(int k = 0; k<4; k++){
       sha256[(i*4)+k]=(char)(v[i] >> (24-8*k));
     }
@@ -66,19 +60,11 @@ sha256(unsigned char block[]){
   int z1, z0, choice, temp1, temp2, majority;
   int len = strlen(block);
   int cont = 0;
-  //printScheduleBlock(scheduleBlock);
-    for(int k = 0; k < 8; k++){
-        printf("v[%d]:", k);
-        printBitInt(v[k]);
-        printf("\n");
-    }
 
   while(len >= 0){
-    printf("chunkBlock: %d\n", cont+1);
     memset(chunkBlock, 0, 64);
 
     if(len > 55){
-      printf("tamanio: %d\n", len);
       memcpy(chunkBlock, block + cont*64, 64);
 
       for(int i=0;i<64; i++){
@@ -96,7 +82,6 @@ sha256(unsigned char block[]){
       len-=64;
     }else{
       memcpy(chunkBlock, block + cont*64, len);
-      printf("tamanio: %d\n", len);
       chunkBlock[strlen(chunkBlock)] = 0x80;
 
 
@@ -149,23 +134,6 @@ sha256(unsigned char block[]){
       v[2]=v[1];
       v[1]=v[0];
       v[0] = temp1 + temp2;
-      
-      /*printf("iteracion:%d \n", i);
-      for(int i = 0; i < 8; i++){
-        v[i] = v[i]+H[i];
-
-        printf("v[%d]:", i);
-        printBitInt(v[i]);
-        printf("\n");
-      }*/
-
-      printf("iteracion:%d \n", i);
-      for(int k = 0; k < 8; k++){
-        printf("v[%d]:", k);
-        printBitInt(v[k]);
-        printf("\n");
-      }
-      printf("\n");
     }
 
     for(int i = 0; i < 8; i++){
@@ -174,7 +142,6 @@ sha256(unsigned char block[]){
     }
     cont++;
   }
-
 
   return buildHash(v);
 }
